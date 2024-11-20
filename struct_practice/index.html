@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rust Auth System</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f9;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .container {
+      width: 400px;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    h2 {
+      text-align: center;
+      color: #333;
+    }
+    form {
+      display: flex;
+      flex-direction: column;
+    }
+    label {
+      margin: 10px 0 5px;
+      font-weight: bold;
+    }
+    input {
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    button {
+      margin: 20px 0;
+      padding: 10px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    .output {
+      margin-top: 20px;
+      padding: 10px;
+      background: #e0ffe0;
+      border: 1px solid #a0ffa0;
+      border-radius: 5px;
+      font-family: monospace;
+    }
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Rust Auth Demo</h2>
+    
+    <form id="signup-form">
+      <h3>Signup</h3>
+      <label for="signup-username">Username</label>
+      <input type="text" id="signup-username" required />
+      
+      <label for="signup-email">Email</label>
+      <input type="email" id="signup-email" required />
+      
+      <label for="signup-password">Password</label>
+      <input type="password" id="signup-password" required />
+      
+      <button type="submit">Signup</button>
+    </form>
+
+    <form id="login-form">
+      <h3>Login</h3>
+      <label for="login-username">Username</label>
+      <input type="text" id="login-username" required />
+      
+      <label for="login-password">Password</label>
+      <input type="password" id="login-password" required />
+      
+      <button type="submit">Login</button>
+    </form>
+
+    <div id="output" class="output hidden"></div>
+  </div>
+
+  <script>
+    const baseUrl = 'http://127.0.0.1:8080';
+
+    const signupForm = document.getElementById('signup-form');
+    const loginForm = document.getElementById('login-form');
+    const outputDiv = document.getElementById('output');
+
+    // Function to display messages
+    const displayOutput = (message, isError = false) => {
+      outputDiv.classList.remove('hidden');
+      outputDiv.style.backgroundColor = isError ? '#ffe0e0' : '#e0ffe0';
+      outputDiv.style.borderColor = isError ? '#ffa0a0' : '#a0ffa0';
+      outputDiv.textContent = message;
+    };
+
+    // Handle Signup
+    signupForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      
+      const username = document.getElementById('signup-username').value;
+      const email = document.getElementById('signup-email').value;
+      const password = document.getElementById('signup-password').value;
+
+      const response = await fetch(`${baseUrl}/signup`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, email, password })
+      });
+
+      const message = await response.text();
+      displayOutput(message, !response.ok);
+    });
+
+    // Handle Login
+    loginForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      
+      const username = document.getElementById('login-username').value;
+      const password = document.getElementById('login-password').value;
+
+      const response = await fetch(`${baseUrl}/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      });
+
+      if (response.ok) {
+        const token = await response.json();
+        displayOutput(`Login Successful! JWT: ${token}`);
+      } else {
+        const message = await response.text();
+        displayOutput(message, true);
+      }
+    });
+  </script>
+</body>
+</html>
