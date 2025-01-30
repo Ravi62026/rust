@@ -11,7 +11,6 @@ struct point (u8, u8, u8);
 struct AlwaysEqual;
 fn main() {
     
-
     let user1 = user{
         active: true,
         username: String::from("Ravi"),
